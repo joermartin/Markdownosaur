@@ -100,11 +100,24 @@ public struct Markdownosaur: MarkupVisitor {
     }
     
     mutating public func visitInlineCode(_ inlineCode: InlineCode) -> NSAttributedString {
-        return NSAttributedString(string: inlineCode.code, attributes: [.font: UIFont.monospacedSystemFont(ofSize: baseFontSize - 1.0, weight: .regular), .foregroundColor: UIColor.systemGray])
+        
+        if #available(iOS 13.0, *) {
+            return NSAttributedString(string: inlineCode.code, attributes: [.font: UIFont.monospacedSystemFont(ofSize: baseFontSize - 1.0, weight: .regular), .foregroundColor: UIColor.systemGray])
+        } else {
+            let font = UIFont(name: "Menlo-Regular", size: baseFontSize - 1.0)!
+            return NSAttributedString(string: inlineCode.code, attributes: [.font: font, .foregroundColor: UIColor.systemGray])
+        }
     }
     
     public func visitCodeBlock(_ codeBlock: CodeBlock) -> NSAttributedString {
-        let result = NSMutableAttributedString(string: codeBlock.code, attributes: [.font: UIFont.monospacedSystemFont(ofSize: baseFontSize - 1.0, weight: .regular), .foregroundColor: UIColor.systemGray])
+        var font: UIFont
+        if #available(iOS 13.0, *) {
+            font = UIFont.monospacedSystemFont(ofSize: baseFontSize - 1.0, weight: .regular)
+        } else {
+            font = UIFont(name: "Menlo-Regular", size: baseFontSize - 1.0)!
+        }
+        
+        let result = NSMutableAttributedString(string: codeBlock.code, attributes: [.font: font, .foregroundColor: UIColor.systemGray])
         
         if codeBlock.hasSuccessor {
             result.append(.singleNewline(withFontSize: baseFontSize))
